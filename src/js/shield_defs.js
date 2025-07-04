@@ -1068,11 +1068,13 @@ export function loadShields() {
   };
   shields["US:CO:NW"] = {
     spriteBlank: "shield_us_co_nw",
-    notext: true,
-  };
-  shields["US:CO:Peña"] = {
-    spriteBlank: "shield_us_co_pena",
-    notext: true,
+    textColor: Color.shields.black,
+    padding: {
+      left: 4,
+      right: 4,
+      top: 5,
+      bottom: 12,
+    },
   };
   [
     "Arapahoe",
