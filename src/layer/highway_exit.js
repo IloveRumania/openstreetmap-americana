@@ -20,9 +20,12 @@ export const exits = {
     "text-line-height": 1,
   },
   paint: {
-    "text-color": "hsla(60, 100%, 50%, 1)",
+    "text-color": "hsla(0, 0%, 100%, 1)",
     "text-halo-color": "#000000",
     "text-halo-width": 0.75,
+    "text-background-color": "#006F53",    // MUTCD green (Pantone 348)
+    "text-background-opacity": 1.0,
+    "text-background-padding": [2, 2],     // Optional: padding around text
   },
 };
 
