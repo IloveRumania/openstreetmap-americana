@@ -383,12 +383,12 @@ const roadSurfaceColor = [
   // Service roads (match on service type)
   [
     "match",
-    ["get", "service"],
+    ["coalesce", ["get", "service"], ""],
     "emergency_access", "hsl(9, 43%, 77%)",
     "parking_aisle", "hsl(36, 5%, 79%)",
     "driveway", "hsl(40, 100%, 95%)",
-    null, "hsl(0, 0%, 100%)",       // normal service road without service=* tag
-    "hsl(40, 43%, 77%)"              // fallback for other service values
+    "", "hsl(0, 0%, 100%)",        // default for missing service
+    "hsl(40, 43%, 77%)"            // fallback
   ]
 ];
 
