@@ -1,4 +1,6 @@
-name: Deploy to GitHub Pages
+# Taken from https://github.com/marketplace/actions/deploy-to-github-pages and ChatGPT
+
+name: Build and Deploy
 
 on:
   push:
