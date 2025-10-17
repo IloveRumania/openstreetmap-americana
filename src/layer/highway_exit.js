@@ -21,11 +21,8 @@ export const exits = {
   },
   paint: {
     "text-color": "hsla(0, 0%, 100%, 1)",
-    "text-halo-color": "#000000",
-    "text-halo-width": 0.75,
-    "text-background-color": "#006F53",    // MUTCD green (Pantone 348)
-    "text-background-opacity": 1.0,
-    "text-background-padding": [2, 2],     // Optional: padding around text
+    "text-halo-color": "#006F53",
+    "text-halo-width": 2.5,
   },
 };
 
