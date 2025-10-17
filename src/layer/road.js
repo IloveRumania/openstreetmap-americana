@@ -343,19 +343,53 @@ const roadSurfaceColor = [
   [
     ...tollSelector,
     `hsl(${tollRoadHue}, 50%, 70%)`,
-    `hsl(${roadHue}, 50%, 70%)`,
+    `hsl(${roadHue}, 50%, 70%)`
   ],
   "trunk",
   [
     ...tollSelector,
     `hsl(${tollRoadHue}, 95%, 80%)`,
-    `hsl(${roadHue}, 95%, 80%)`,
+    `hsl(${roadHue}, 95%, 80%)`
   ],
+
+  // Primary roads (OMT stops)
   [
-    ...tollSelector,
-    `hsl(${tollRoadHue}, 100%, 40%)`,
-    `hsl(${roadHue}, 0%, 80%)`,
+    "interpolate", ["exponential", 1], ["zoom"],
+    7, "hsl(35, 83%, 73%)",
+    11, "hsl(34, 94%, 82%)"
   ],
+
+  // Secondary roads
+  [
+    "interpolate", ["exponential", 1], ["zoom"],
+    10.5, "hsl(0, 0%, 73%)",
+    10.6, "hsl(63, 86%, 86%)"
+  ],
+
+  // Tertiary roads
+  [
+    "interpolate", ["exponential", 1], ["zoom"],
+    10.5, "hsl(0, 0%, 73%)",
+    10.6, "hsl(72, 71%, 92%)"
+  ],
+
+  // Minor roads
+  [
+    "interpolate", ["exponential", 1], ["zoom"],
+    12, "hsl(0, 0%, 83%)",
+    13, "hsl(0, 0%, 100%)"
+  ],
+
+  // Service roads (match on service type)
+  [
+    "match",
+    ["get", "service"],
+    "emergency_access", "hsl(9, 43%, 77%)",
+    "parking_aisle", "hsl(36, 5%, 79%)",
+    "driveway", "hsl(40, 100%, 95%)",
+    null, "hsl(0, 0%, 100%)",       // normal service road without service=* tag
+    "hsl(40, 43%, 77%)"              // fallback for other service values
+  ]
 ];
 
 function roadFillColor(hue, minZoom, transitionZoom) {
