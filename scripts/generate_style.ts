@@ -22,7 +22,7 @@ const opts: OptionValues = program.opts();
 
 const style: StyleSpecification = Style.build(
   config.OPENMAPTILES_URL,
-  "https://americanamap.org/sprites/sprite",
+  "https://iloverumania.github.io/openstreetmap-americana/sprites/sprite",
   "https://font.americanamap.org/{fontstack}/{range}.pbf",
   opts.locales
 );
