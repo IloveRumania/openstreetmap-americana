@@ -24,7 +24,7 @@ const locales = opts.locales[0].split(",");
 
 const style = Style.build(
   config.OPENMAPTILES_URL,
-  "https://iloverumania.github.io/sprites/sprite",
+  "https://iloverumania.github.io/openstreetmap-americana/sprites/sprite",
   "https://font.americanamap.org/{fontstack}/{range}.pbf",
   locales
 );
