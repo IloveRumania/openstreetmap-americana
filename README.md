@@ -29,9 +29,9 @@ OpenStreetMap Americana is a community project supported by [OSM US](https://ope
 
 ## How to use
 
-You can install the OpenStreetMap Americana package and [deploy it anywhere](CONTRIBUTING.md#Production%20builds) as a static webpage. For your convenience, we’ve deployed it [on GitHub Pages](https://americanamap.org/). Click the Legend button to learn the meaning of each symbol, line, and color based on the features currently visible on the map.
+You can install the OpenStreetMap Americana package and [deploy it anywhere](CONTRIBUTING.md#Production%20builds) as a static webpage. For your convenience, we’ve deployed it [on GitHub Pages](https://iloverumania.github.io/). Click the Legend button to learn the meaning of each symbol, line, and color based on the features currently visible on the map.
 
-The style tries to label places in [your browser’s preferred language](https://www.w3.org/International/questions/qa-lang-priorities). To change this preference, consult your browser’s documentation: [Chrome](https://support.google.com/chrome/answer/173424), [Firefox](https://support.mozilla.org/en-US/kb/use-firefox-another-language), [Safari for macOS](https://support.apple.com/guide/mac-help/change-the-system-language-mh26684/mac), [Safari for iOS](https://support.apple.com/en-us/HT204031). You can also override this preference by adding `&language=` to the URL, followed by a comma-separated list of [IETF language tags](https://www.w3.org/International/articles/language-tags/). For example, here’s a map labeled [in Portuguese, falling back to Spanish](https://americanamap.org/#language=pt,es). If we don’t have the name of a place in any of your preferred languages, the style shows the name in the local language as a last resort.
+The style tries to label places in [your browser’s preferred language](https://www.w3.org/International/questions/qa-lang-priorities). To change this preference, consult your browser’s documentation: [Chrome](https://support.google.com/chrome/answer/173424), [Firefox](https://support.mozilla.org/en-US/kb/use-firefox-another-language), [Safari for macOS](https://support.apple.com/guide/mac-help/change-the-system-language-mh26684/mac), [Safari for iOS](https://support.apple.com/en-us/HT204031). You can also override this preference by adding `&language=` to the URL, followed by a comma-separated list of [IETF language tags](https://www.w3.org/International/articles/language-tags/). For example, here’s a map labeled [in Portuguese, falling back to Spanish](https://iloverumania.github.io/#language=pt,es). If we don’t have the name of a place in any of your preferred languages, the style shows the name in the local language as a last resort.
 
 ## Contributor’s guide
 
@@ -62,9 +62,9 @@ The dynamic shield generator is included as a [module](shieldlib/README.md) in t
 
 ## Artifacts
 
-- Style users can use the maplibre [StyleJSON](https://americanamap.org/style.json), and sprite sheets ([1x](https://americanamap.org/sprites/sprite.png), [2x](https://americanamap.org/sprites/sprite@2x.png)).
-- For highway shield library users, a [ShieldJSON](https://americanamap.org/shields.json) must be supplied to associate route networks with sprite images and drawn shield shapes.
-- The project [taginfo.json](https://americanamap.org/taginfo.json) lists which tags are used by the style.
+- Style users can use the maplibre [StyleJSON](https://iloverumania.github.io/style.json), and sprite sheets ([1x](https://iloverumania.github.io/sprites/sprite.png), [2x](https://iloverumania.github.io/sprites/sprite@2x.png)).
+- For highway shield library users, a [ShieldJSON](https://iloverumania.github.io/shields.json) must be supplied to associate route networks with sprite images and drawn shield shapes.
+- The project [taginfo.json](https://iloverumania.github.io/taginfo.json) lists which tags are used by the style.
 
 ## Data sources
 
