@@ -1,125 +1,333 @@
 "use strict";
 
+import * as Color from "../constants/color.js";
 import * as Util from "../js/util.js";
 
-// Zoom thresholds
-const minZoomAllRoads = 4;
-const minZoomMotorwayTrunk = 5;
-const minZoomPrimary = 7;
-const minZoomSecondary = 9;
-const minZoomTertiary = 11;
-const minZoomMinor = 12;
-const minZoomService = 13;
-const minZoomSmallService = 15;
+const motorwayHue = 218;
+const stateHue = 40;
+const tollRoadHue = 100;
 
-const tunnelDashArray = ["step", ["zoom"], ["literal", [1]], 11, ["literal", [0.5, 0.25]]];
+// Common filter expressions
+const isRoad = [
+  "match",
+  ["get", "class"],
+  [
+    "motorway",
+    "trunk",
+    "primary",
+    "secondary",
+    "tertiary",
+    "minor",
+    "service",
+    "busway",
+    "bus_guideway",
+  ],
+  true,
+  false,
+];
+const isRamp = ["==", ["get", "ramp"], 1];
+const isNotRamp = ["!", isRamp];
+const isToll = ["==", ["get", "toll"], 1];
+const isNotToll = ["!", isToll];
+const isMotorway = ["all", ["==", ["get", "class"], "motorway"], isNotRamp];
+const isNotMotorway = ["!=", ["get", "class"], "motorway"];
+const isState = [
+  "match",
+  ["get", "network"],
+  ["us-highway", "us-state"],
+  isNotRamp,
+  false,
+];
+const isNotState = ["!", isState];
+const isExpressway = ["==", ["get", "expressway"], 1];
+const isNotExpressway = ["!", isExpressway];
+const isService = ["==", ["get", "class"], "service"];
+const isNotService = ["!", isService];
+const isMinorService = [
+  "match",
+  ["get", "service"],
+  ["parking_aisle", "driveway"],
+  true,
+  false,
+];
+const isConstruction = ["in", "_construction", ["get", "class"]];
+const isNotConstruction = ["!", isConstruction];
+const isUnpaved = ["==", ["get", "surface"], "unpaved"];
 
-// Helpers
-const getBrunnel = (f) => f.brunnel;
-const getClass = (f) => f.class;
-const getRamp = (f) => f.ramp || 0;
-const isService = (f) => f.highway === "service";
-const isServiceExcluded = (f) => ["parking_aisle","driveway","emergency_access"].includes(f.service) || f.service == null;
+const roadFilter = [
+  "step",
+  ["zoom"],
+  false,
+  4,
+  ["all", ["==", ["get", "network"], "us-interstate"], isNotConstruction],
+  5,
+  ["match", ["get", "class"], ["motorway", "trunk"], isNotRamp, false],
+  7,
+  [
+    "match",
+    ["get", "class"],
+    ["motorway", "trunk", "primary"],
+    isNotRamp,
+    false,
+  ],
+  9,
+  [
+    "match",
+    ["get", "class"],
+    ["motorway", "trunk", "primary", "secondary"],
+    true,
+    false,
+  ],
+  11,
+  ["all", isRoad, isNotService, isNotConstruction],
+  12,
+  ["all", isRoad, ["!", isMinorService], isNotConstruction],
+  13,
+  ["all", isRoad, isNotConstruction],
+];
 
-// Combine constraints
-function combineConstraints(c1, c2) {
-  if (!c1) return c2 || null;
-  if (!c2) return c1;
-  return (f) => c1(f) && c2(f);
-}
+export const road = {
+  id: "road",
+  type: "line",
+  source: "openmaptiles",
+  "source-layer": "transportation",
+  filter: Util.mapRampExpression(roadFilter, (input, output) => [
+    "all",
+    output,
+    ["!=", ["get", "brunnel"], "tunnel"],
+  ]),
+  layout: {
+    "line-cap": "butt",
+    "line-join": "round",
+    "line-sort-key": [
+      "+",
+      ["to-number", isMotorway],
+      ["to-number", isState],
+      ["to-number", isRamp],
+    ],
+  },
+  paint: {
+    "line-color": [
+      "interpolate-lab",
+      ["exponential", 1.2],
+      ["zoom"],
+      4,
+      [
+        "case",
+        isToll,
+        `hsl(${tollRoadHue}, 60%, 70%)`,
+        isMotorway,
+        `hsl(${motorwayHue}, 60%, 70%)`,
+        isState,
+        `hsl(${stateHue}, 77%, 50%)`,
+        "#9c9c9c",
+      ],
+      8,
+      [
+        "case",
+        isToll,
+        `hsl(${tollRoadHue}, 100%, 40%)`,
+        isMotorway,
+        `hsl(${motorwayHue}, 100%, 45%)`,
+        isState,
+        `hsl(${stateHue}, 77%, 50%)`,
+        "#9c9c9c",
+      ],
+      14,
+      [
+        "case",
+        isToll,
+        `hsl(${tollRoadHue}, 100%, 35%)`,
+        isMotorway,
+        `hsl(${motorwayHue}, 100%, 35%)`,
+        isState,
+        `hsl(${stateHue}, 77%, 50%)`,
+        ["all", ["==", ["get", "class"], "motorway"], isRamp],
+        "#000",
+        "#9c9c9c",
+      ],
+    ],
+    "line-width": [
+      "interpolate",
+      ["exponential", 1.2],
+      ["zoom"],
+      4,
+      1,
+      8,
+      [
+        "case",
+        isMotorway,
+        3,
+        isExpressway,
+        1,
+        isState,
+        2,
+        ["match", ["get", "class"], ["trunk", "primary"], isNotRamp, false],
+        2,
+        0.25,
+      ],
+      18,
+      [
+        "case",
+        isMotorway,
+        6,
+        ["all", isState, isNotExpressway],
+        4,
+        [
+          "match",
+          ["get", "class"],
+          ["trunk", "primary", "secondary", "tertiary"],
+          isNotRamp,
+          false,
+        ],
+        4,
+        isService,
+        1,
+        3,
+      ],
+      20,
+      [
+        "case",
+        isMotorway,
+        10,
+        ["all", isState, isNotExpressway],
+        8,
+        [
+          "match",
+          ["get", "class"],
+          ["trunk", "primary", "secondary", "tertiary"],
+          isNotRamp,
+          false,
+        ],
+        8,
+        isService,
+        1,
+        6,
+      ],
+    ],
+    "line-gap-width": [
+      "interpolate",
+      ["exponential", 1.2],
+      ["zoom"],
+      4,
+      ["case", isExpressway, 1, 0],
+      12,
+      ["case", isExpressway, 3, 0],
+      14,
+      0,
+    ],
+    "line-blur": [
+      "interpolate",
+      ["exponential", 1.2],
+      ["zoom"],
+      4,
+      ["case", isUnpaved, 1, 0],
+      8,
+      ["case", isUnpaved, 2, 0],
+      18,
+      ["case", isUnpaved, 3, 0],
+      20,
+      ["case", isUnpaved, 6, 0],
+    ],
+  },
+};
 
-// Road filter
-function filterRoad(constraints, brunnel = null) {
-  const baseFilter = (f) =>
-    ["motorway","trunk","primary","secondary","tertiary","busway","bus_guideway","minor","service"].includes(getClass(f));
-  let filter = combineConstraints(baseFilter, constraints);
-  if (brunnel) {
-    const brunnelFilter = brunnel === "surface"
-      ? (f) => !["bridge","tunnel"].includes(getBrunnel(f))
-      : (f) => getBrunnel(f) === brunnel;
-    filter = combineConstraints(filter, brunnelFilter);
-  }
-  return filter;
-}
+export const roadTunnel = {
+  ...road,
+  id: "road-tunnel",
+  filter: Util.mapRampExpression(roadFilter, (input, output) => [
+    "all",
+    output,
+    ["==", ["get", "brunnel"], "tunnel"],
+  ]),
+  paint: {
+    ...road.paint,
+    "line-width": 1,
+    "line-gap-width": Util.mapRampExpression(
+      road.paint["line-width"],
+      (input, output) => ["-", output, 1]
+    ),
+    "line-dasharray": [5, 5],
+  },
+};
 
-// Base layer generator
-function baseRoadLayer(id, constraints, brunnel = null, minzoom = minZoomAllRoads, maxzoom = 20) {
-  const layer = Util.layerClone({ type: "line", source: "road" }, id);
-  layer.filter = filterRoad(constraints, brunnel);
-  layer.minzoom = minzoom;
-  layer.maxzoom = maxzoom;
-  return layer;
-}
+export const roadBridgeKnockout = {
+  ...road,
+  id: "road-bridge-knockout",
+  filter: Util.mapRampExpression(roadFilter, (input, output) => [
+    "all",
+    output,
+    ["==", ["get", "brunnel"], "bridge"],
+  ]),
+  paint: {
+    "line-color": Color.backgroundFill,
+    "line-width": Util.mapRampExpression(
+      road.paint["line-width"],
+      (input, output) => ["*", output, 2]
+    ),
+    "line-gap-width": 0,
+    "line-blur": 0,
+  },
+};
 
-// Fill colors (OSM-Carto + exceptions)
-function getFillColor(f) {
-  switch(getClass(f)) {
-    case "motorway": return "#e892a2";
-    case "trunk": return "#f2d16d";
-    case "primary": return "#f2e3c8";
-    case "secondary": return "#d9e6be";
-    case "tertiary": return "hsl(72, 71%, 92%)"; // custom exception
-    case "minor": return "#e0e0e0";
-    case "busway": return "hsl(322, 70%, 70%)";
-    case "service": return isServiceExcluded(f) ? "#e0e0e0" : "#DECDAB";
-    default: return "#c0c0c0";
-  }
-}
+export const roadBridgeCasing = {
+  ...road,
+  id: "road-bridge-casing",
+  filter: Util.mapRampExpression(roadFilter, (input, output) => [
+    "all",
+    output,
+    ["==", ["get", "brunnel"], "bridge"],
+  ]),
+  paint: {
+    "line-color": "#9c9c9c",
+    "line-width": 0.5,
+    "line-gap-width": roadBridgeKnockout.paint["line-width"],
+    "line-blur": 0,
+  },
+};
 
-// Base Road class
-class Road {
-  constructor() {
-    this.brunnel = "surface";
-    this.minZoomFill = minZoomAllRoads;
-    this.minZoomCasing = minZoomAllRoads;
-    this.sortKey = 0;
-  }
-
-  fill() {
-    const layer = baseRoadLayer("fill", () => true, this.brunnel, this.minZoomFill);
-    layer.layout = { "line-cap": "round", "line-join": "round", visibility: "visible" };
-    layer.paint = {
-      "line-opacity": 1,
-      "line-color": (f) => getFillColor(f),
-      "line-width": 2,
-      "line-blur": 0.5
-    };
-    return layer;
-  }
-
-  casing() {
-    const layer = baseRoadLayer("casing", () => true, this.brunnel, this.minZoomCasing);
-    layer.layout = { "line-cap": "round", "line-join": "round", visibility: "visible" };
-    layer.paint = {
-      "line-opacity": 1,
-      "line-color": "hsl(0, 40%, 40%)",
-      "line-width": 4,
-      "line-blur": 0.5
-    };
-    if (this.brunnel === "tunnel") layer.paint["line-dasharray"] = tunnelDashArray;
-    return layer;
-  }
-}
-
-// Subclasses
-class Motorway extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "motorway" && !getRamp(f); } }
-class Trunk extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "trunk"; } }
-class Primary extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "primary"; } }
-class Secondary extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "secondary"; } }
-class Tertiary extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "tertiary"; } }
-class Minor extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "minor"; } }
-class Service extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "service"; } }
-class Busway extends Road { constructor() { super(); this.filter = (f) => getClass(f) === "busway"; } }
-class Tunnel extends Road { constructor() { super(); this.brunnel = "tunnel"; } }
-
-// Export instances
-export const road = new Road();
-export const roadMotorway = new Motorway();
-export const roadTrunk = new Trunk();
-export const roadPrimary = new Primary();
-export const roadSecondary = new Secondary();
-export const roadTertiary = new Tertiary();
-export const roadMinor = new Minor();
-export const roadService = new Service();
-export const roadBusway = new Busway();
-export const roadTunnel = new Tunnel();
+export const legendEntries = [
+  {
+    description: "Controlled-access highway",
+    layers: [road.id],
+    filter: ["all", isMotorway, isNotToll],
+  },
+  {
+    description: "Limited-access highway",
+    layers: [road.id],
+    filter: ["all", isExpressway, isNotToll],
+  },
+  {
+    description: "State highway",
+    layers: [road.id],
+    filter: ["all", isState, isNotToll, isNotExpressway],
+  },
+  {
+    description: "Local road",
+    layers: [road.id],
+    filter: [
+      "all",
+      isNotMotorway,
+      isNotState,
+      isNotToll,
+      isNotExpressway,
+      isNotRamp,
+      isNotService,
+    ],
+  },
+  {
+    description: "Service road",
+    layers: [road.id],
+    filter: isService,
+  },
+  {
+    description: "Toll road",
+    layers: [road.id],
+    filter: ["all", isToll, isNotRamp],
+  },
+  {
+    description: "Unpaved road",
+    layers: [road.id],
+    filter: isUnpaved,
+  },
+];
