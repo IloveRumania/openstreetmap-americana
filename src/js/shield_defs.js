@@ -704,7 +704,7 @@ export function loadShields() {
       textColor: Color.shields.green,
       colorLighten: Color.shields.green,
     },
-    ["HIST"],
+    ["OLD"],
     Color.shields.green
   );
 
