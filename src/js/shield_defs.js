@@ -698,6 +698,15 @@ export function loadShields() {
     ["HIST"],
     Color.shields.brown
   );
+  shields["US:US:Old"] = banneredShield(
+    {
+      ...badgeShieldCrossbar,
+      textColor: Color.shields.green,
+      colorLighten: Color.shields.green,
+    },
+    ["HIST"],
+    Color.shields.green
+  );
 
   // US Federal Agencies
 
