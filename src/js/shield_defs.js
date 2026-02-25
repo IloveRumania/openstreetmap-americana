@@ -1034,6 +1034,8 @@ export function loadShields() {
     },
     bannerMap: {
       "US:CA:Business": ["BUS"],
+      "US:CA:Bypass": ["BYP"],
+      "US:CA:Express": ["EXPR"],
     },
   };
   ["CR", "Nevada", "Sierra"].forEach(
@@ -2154,8 +2156,8 @@ export function loadShields() {
     },
   };
 
-  // County shields (only Washoe in this case)
-  ["Washoe"].forEach((county) => {
+  // County shields
+  ["Washoe", "White Pine"].forEach((county) => {
     shields[`US:NV:${county}`] = pentagonUpShield(
       3,
       15,
